@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitbot:Your Wellness Assitant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg">
+    
+    <div class="chat-container">
+        <div class="cs"><h1 style="color: #333;">Fitbot:Your Wellness Assitant</h1></div>
+
+        <div id="chat-box">
+            <div class="message bot-message">
+                Please tell me your gender, age, weight, and height in this format:
+                <ul>
+                    <li>Gender: your gender</li>
+                    <li>Age: your age</li>
+                    <li>Weight: your weight</li>
+                    <li>Height: your height</li>
+                </ul>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <div id="send-icon">➤</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('send-icon').addEventListener('click', () => {
+            const userInput = document.getElementById('user-input').value;
+            if (userInput) {
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'message user-message';
+                userMessageDiv.textContent = userInput;
+                document.getElementById('chat-box').appendChild(userMessageDiv);
+
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userInput }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const botMessageDiv = document.createElement('div');
+                    botMessageDiv.className = 'message bot-message';
+                    botMessageDiv.innerHTML = data.response; // Use innerHTML to render HTML
+                    document.getElementById('chat-box').appendChild(botMessageDiv);
+                    document.getElementById('user-input').value = '';
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Allow sending message by pressing Enter key
+        document.getElementById('user-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                document.getElementById('send-icon').click();
+            }
+        });
+
+    </script>
+    
+</body>
+</html>  
